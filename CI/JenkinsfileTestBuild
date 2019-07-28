@@ -1,18 +1,73 @@
+
+
 pipeline {
     agent {
         label 'vagrant'
     }
+
+    options {
+        disableConcurrentBuilds()
+        lock resource: "polycube"
+        timeout(time: 4, unit: 'HOURS')
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+    }
+
     stages {
-        stage('Build') {
+        stage('Clean') {
             steps {
+             dir("CI/vagrant/"){
                 echo 'Start building polycube'
-                sh 'cd ${POLYCUBE_WORKSPACE} && ./start.sh ${WORKSPACE}'
+                sh """
+                export JENKINS_WORKSPACE=${WORKSPACE}
+                vagrant destroy -f
+                """
+             }
             }
         }
+
+
+        stage('Build') {
+            steps {
+             dir("CI/vagrant/"){
+                echo 'Start building polycube'
+                sh """
+                export JENKINS_WORKSPACE=${WORKSPACE}
+                vagrant up
+                """
+             }
+            }
+        }
+
+        stage('Install') {
+            steps {
+             dir("CI/vagrant/"){
+                echo 'Start building polycube'
+                sh """
+                export JENKINS_WORKSPACE=${WORKSPACE}
+                vagrant ssh -c "cd /vagrant && ./scripts/install.sh"
+                """
+             }
+            }
+        }
+
+        stage('Final CleanUp') {
+            steps {
+             dir("CI/vagrant/"){
+                echo 'Start building polycube'
+                sh """
+                export JENKINS_WORKSPACE=${WORKSPACE}
+                vagrant destroy -f
+                echo "${POLYCUBE_WORKSPACE}"
+                """
+             }
+            }
+        }
+
     }
 
     post {
         always {
+
             sh 'rm -rf ${WORKSPACE}/*'
         }
     }
