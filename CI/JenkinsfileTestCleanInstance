@@ -223,11 +223,11 @@ pipeline {
                                     docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag}
                                     
                                     # Copying binaries
-                                    sudo docker cp \$container:/usr/local/bin /usr/local
+                                    sudo docker cp -a \$container:/usr/local/bin /usr/local
 
                                     # Copying headers
                                     sudo mkdir -p /usr/include/polycube
-                                    sudo docker cp \$container:/usr/include/polycube /usr/include
+                                    sudo docker cp -a \$container:/usr/include/polycube /usr/include
                                     
                                     # Copying libraries
                                     for lib in \$(docker exec \$container ls /usr/lib | grep "libp")
@@ -237,7 +237,9 @@ pipeline {
                                     ldconfig -n /usr/lib
                                     ​
                                     for lib in \$(docker exec \$container ls /usr/local/lib | grep "lib"
+                                    do
                                         sudo docker cp \$container:/usr/local/lib/\$lib /usr/local
+                                    done
                                     ldconfig -n /usr/local/lib
                                     
                                     for lib in \$(docker exec \$container ls /usr/lib/x86_64-linux-gnu/ | grep -P "libyang|libnl")
