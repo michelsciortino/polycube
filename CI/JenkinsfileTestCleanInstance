@@ -68,6 +68,7 @@ pipeline {
     environment {
         image_tag = "${env.GIT_COMMIT}"
         image_name = "polycube"
+        container = "polycubed"
         registryCred = credentials('polycube-repo')
         notification_url = credentials('slack-notifications')
         github_token = credentials('github_status_update')
@@ -215,46 +216,18 @@ pipeline {
                         script {
                             docker.withRegistry("", 'polycube-repo') {
                                 sh """
-                                    container="polycubed"
-                                    docker stop \$container || true
+                                    docker stop $container || true
                                     docker system prune --all --force
                                     # Launch the polycubed daemon and extract the polycubectl
                                     # /proc is mounted under /host/proc to have a complete visibility of the namespaces created outside of the container
-                                    docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag} /bin/sleep infinity
-                                    
-                                    # Copying binaries
-                                    sudo docker cp -a \$container:/usr/local/bin /usr/local
+                                    docker run -d --name $container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag} /bin/sleep infinity
 
-                                    # Copying headers
-                                    sudo mkdir -p /usr/include/polycube
-                                    sudo docker cp -a \$container:/usr/include/polycube /usr/include
-                                    
-                                    # Copying libraries
-                                    for lib in \$(docker exec \$container ls /usr/lib | grep "libp")
-                                    do
-                                        sudo docker cp \$container:/usr/lib/\$lib /usr/lib/
-                                    done
-                                    #ldconfig -n /usr/lib
-                                    ​
-                                    for lib in \$(docker exec \$container ls /usr/local/lib | grep "lib"
-                                    do
-                                        sudo docker cp \$container:/usr/local/lib/\$lib /usr/local
-                                    done
-                                    #ldconfig -n /usr/local/lib
-                                    
-                                    for lib in \$(docker exec \$container ls /usr/lib/x86_64-linux-gnu/ | grep -P "libyang|libnl")
-                                    do
-                                        sudo docker cp \$container:/usr/lib/x86_64-linux-gnu/\$lib /usr/lib/x86_64-linux-gnu
-                                    done
-                                    ​
-                                    for lib in \$(docker exec \$container ls /lib/x86_64-linux-gnu/ | grep -P "libnl")
-                                    do
-                                        sudo docker cp \$container:/lib/x86_64-linux-gnu/\$lib /lib/x86_64-linux-gnu
-                                    done
+                                    # Copying binaries, headers and libraries from docker to host fs
+                                    ./CI/extract_from_docker_image.sh $container
 
                                     # Overload environment variables in order to adapt the behavior of run_tests script
-                                    export KILL_COMMAND="docker stop \$container"
-                                    export polycubed="docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /lib/modules:/lib/modules:ro -v /proc:/host/proc -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag}"
+                                    export KILL_COMMAND="docker stop $container"
+                                    export polycubed="docker run -d --name $container --rm --privileged --pid=host --cap-add ALL --network host -v /lib/modules:/lib/modules:ro -v /proc:/host/proc -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag}"
                                     # Killing polycube image if running
                                     \$KILL_COMMAND
                                     cd tests/
@@ -277,9 +250,8 @@ pipeline {
                                 archiveArtifacts artifacts: 'tests/test_results*'
                             }
                             script {
-                                sh """                                
-                                    container="polycubed"
-                                    docker stop \$container || true
+                                sh """
+                                    docker stop $container || true
                                     docker system prune --all --force
                                 """
                             }
@@ -310,42 +282,16 @@ pipeline {
                         script {
                             docker.withRegistry("", 'polycube-repo') {
                                 sh """
-                                    container="polycubed"
-                                    docker stop \$container || true
+                                    docker stop $container || true
                                     docker system prune --all --force
                                     set +e
-                                    docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag} /bin/sleep infinity
+                                    docker run -d --name $container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag} /bin/sleep infinity
 
-                                    # Copying binaries
-                                    sudo docker cp -a \$container:/usr/local/bin /usr/local
+                                    # Copying binaries, headers and libraries from docker to host fs
+                                    ./CI/extract_from_docker_image.sh $container
 
-                                    # Copying headers
-                                    sudo mkdir -p /usr/include/polycube
-                                    sudo docker cp -a \$container:/usr/include/polycube /usr/include
-                                    
-                                    # Copying libraries
-                                    for lib in \$(docker exec \$container ls /usr/lib | grep "libp")
-                                    do
-                                        sudo docker cp \$container:/usr/lib/\$lib /usr/lib/
-                                    done
-                                    #ldconfig -n /usr/lib
-                                    ​
-                                    for lib in \$(docker exec \$container ls /usr/local/lib | grep "lib"
-                                        sudo docker cp \$container:/usr/local/lib/\$lib /usr/local
-                                    #ldconfig -n /usr/local/lib
-                                    
-                                    for lib in \$(docker exec \$container ls /usr/lib/x86_64-linux-gnu/ | grep -P "libyang|libnl")
-                                    do
-                                        sudo docker cp \$container:/usr/lib/x86_64-linux-gnu/\$lib /usr/lib/x86_64-linux-gnu
-                                    done
-                                    ​
-                                    for lib in \$(docker exec \$container ls /lib/x86_64-linux-gnu/ | grep -P "libnl")
-                                    do
-                                        sudo docker cp \$container:/lib/x86_64-linux-gnu/\$lib /lib/x86_64-linux-gnu
-                                    done
-
-                                    export KILL_COMMAND="docker stop \$container"
-                                    export polycubed="docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /lib/modules:/lib/modules:ro -v /proc:/host/proc -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag}"
+                                    export KILL_COMMAND="docker stop $container"
+                                    export polycubed="docker run -d --name $container --rm --privileged --pid=host --cap-add ALL --network host -v /lib/modules:/lib/modules:ro -v /proc:/host/proc -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag}"
                                     cd tests/ && ./run-tests.sh false || true
                                     export LC_ALL=C
                                     virtualenv venv -p python3
@@ -365,8 +311,7 @@ pipeline {
                                     archiveArtifacts artifacts: 'tests/test_results*'
                                 }
                                 sh """
-                                    container="polycubed"
-                                    docker stop \$container || true
+                                    docker stop $container || true
                                     docker system prune --all --force
                                 """
                             }
@@ -397,41 +342,15 @@ pipeline {
                         script {
                             docker.withRegistry("", 'polycube-repo') {
                                 sh """
-                                    container="polycubed"
-                                    docker stop \$container || true
+                                    docker stop $container || true
                                     docker system prune --all --force
                                     set +e
-                                    docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-pcn-iptables:${image_tag} /bin/sleep infinity
+                                    docker run -d --name $container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-pcn-iptables:${image_tag} /bin/sleep infinity
 
-                                    # Copying binaries
-                                    sudo docker cp -a \$container:/usr/local/bin /usr/local
-
-                                    # Copying headers
-                                    sudo mkdir -p /usr/include/polycube
-                                    sudo docker cp -a \$container:/usr/include/polycube /usr/include
+                                    # Copying binaries, headers and libraries from docker to host fs
+                                    ./CI/extract_from_docker_image.sh $container
                                     
-                                    # Copying libraries
-                                    for lib in \$(docker exec \$container ls /usr/lib | grep "libp")
-                                    do
-                                        sudo docker cp \$container:/usr/lib/\$lib /usr/lib/
-                                    done
-                                    #ldconfig -n /usr/lib
-                                    ​
-                                    for lib in \$(docker exec \$container ls /usr/local/lib | grep "lib"
-                                        sudo docker cp \$container:/usr/local/lib/\$lib /usr/local
-                                    #ldconfig -n /usr/local/lib
-                                    
-                                    for lib in \$(docker exec \$container ls /usr/lib/x86_64-linux-gnu/ | grep -P "libyang|libnl")
-                                    do
-                                        sudo docker cp \$container:/usr/lib/x86_64-linux-gnu/\$lib /usr/lib/x86_64-linux-gnu
-                                    done
-                                    ​
-                                    for lib in \$(docker exec \$container ls /lib/x86_64-linux-gnu/ | grep -P "libnl")
-                                    do
-                                        sudo docker cp \$container:/lib/x86_64-linux-gnu/\$lib /lib/x86_64-linux-gnu
-                                    done
-                                    
-                                    export KILL_COMMAND="docker stop \$container"
+                                    export KILL_COMMAND="docker stop $container"
                                     export polycubed="docker run -d --name polycubed --rm --privileged --pid=host --cap-add ALL --network host -v /lib/modules:/lib/modules:ro -v /proc:/host/proc -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-pcn-iptables:${image_tag}"
                                     cd tests/ && ./run-tests-iptables.sh || true
                                     export LC_ALL=C
@@ -452,8 +371,7 @@ pipeline {
                             }
                             script {
                                 sh """
-                                    container="polycubed"
-                                    docker stop \$container || true
+                                    docker stop $container || true
                                     docker system prune --all --force
                                 """
                             }
