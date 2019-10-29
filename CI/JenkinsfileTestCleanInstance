@@ -226,7 +226,7 @@ pipeline {
                                     sudo docker cp \$container:/usr/local/bin /usr/local
 
                                     # Copying headers
-                                    mkdir -p /usr/include/polycube
+                                    sudo mkdir -p /usr/include/polycube
                                     sudo docker cp \$container:/usr/include/polycube /usr/include
                                     
                                     # Copying libraries
@@ -318,7 +318,7 @@ pipeline {
                                     sudo docker cp \$container:/usr/local/bin /usr/local
 
                                     # Copying headers
-                                    mkdir -p /usr/include/polycube
+                                    sudo mkdir -p /usr/include/polycube
                                     sudo docker cp \$container:/usr/include/polycube /usr/include
                                     
                                     # Copying libraries
@@ -405,7 +405,7 @@ pipeline {
                                     sudo docker cp \$container:/usr/local/bin /usr/local
 
                                     # Copying headers
-                                    mkdir -p /usr/include/polycube
+                                    sudo mkdir -p /usr/include/polycube
                                     sudo docker cp \$container:/usr/include/polycube /usr/include
                                     
                                     # Copying libraries
