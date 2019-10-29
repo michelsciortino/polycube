@@ -30,3 +30,9 @@ for lib in $(docker exec $container ls /lib/x86_64-linux-gnu/ | grep -P "libnl")
     echo "Copying $container:/lib/x86_64-linux-gnu/$lib to /lib/x86_64-linux-gnu"
     sudo docker cp $container:/lib/x86_64-linux-gnu/$lib /lib/x86_64-linux-gnu
 done
+# Copying base yang models
+sudo mkdir -p /usr/local/include/polycube
+echo "Copying $container:/usr/local/include/polycube to /usr/local/include/"
+sudo docker cp -a $container:/usr/local/include/polycube /usr/local/include/
+sudo ldconfig -n /usr/local/include/
+​
