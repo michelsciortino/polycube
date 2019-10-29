@@ -18,8 +18,8 @@ for lib in $(docker exec $container ls /usr/lib | grep "libp"); do
 done
 ldconfig -n /usr/lib
 for lib in $(docker exec $container ls /usr/local/lib | grep "lib"); do
-    echo "Copying $container:/usr/local/lib/$lib to /usr/local"
-    sudo docker cp $container:/usr/local/lib/$lib /usr/local
+    echo "Copying $container:/usr/local/lib/$lib to /usr/local/lib"
+    sudo docker cp $container:/usr/local/lib/$lib /usr/local/lib
 done
 ldconfig -n /usr/local/lib
 for lib in $(docker exec $container ls /usr/lib/x86_64-linux-gnu/ | grep -P "libyang|libnl"); do
