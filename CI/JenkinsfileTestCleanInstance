@@ -220,7 +220,7 @@ pipeline {
                                     docker system prune --all --force
                                     # Launch the polycubed daemon and extract the polycubectl
                                     # /proc is mounted under /host/proc to have a complete visibility of the namespaces created outside of the container
-                                    docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag}
+                                    docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag} /bin/sleep infinity
                                     
                                     # Copying binaries
                                     sudo docker cp -a \$container:/usr/local/bin /usr/local
@@ -314,14 +314,14 @@ pipeline {
                                     docker stop \$container || true
                                     docker system prune --all --force
                                     set +e
-                                    docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag}
+                                    docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag} /bin/sleep infinity
 
                                     # Copying binaries
-                                    sudo docker cp \$container:/usr/local/bin /usr/local
+                                    sudo docker cp -a \$container:/usr/local/bin /usr/local
 
                                     # Copying headers
                                     sudo mkdir -p /usr/include/polycube
-                                    sudo docker cp \$container:/usr/include/polycube /usr/include
+                                    sudo docker cp -a \$container:/usr/include/polycube /usr/include
                                     
                                     # Copying libraries
                                     for lib in \$(docker exec \$container ls /usr/lib | grep "libp")
@@ -401,14 +401,14 @@ pipeline {
                                     docker stop \$container || true
                                     docker system prune --all --force
                                     set +e
-                                    docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-pcn-iptables:${image_tag}
+                                    docker run -d --name \$container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-pcn-iptables:${image_tag} /bin/sleep infinity
 
                                     # Copying binaries
-                                    sudo docker cp \$container:/usr/local/bin /usr/local
+                                    sudo docker cp -a \$container:/usr/local/bin /usr/local
 
                                     # Copying headers
                                     sudo mkdir -p /usr/include/polycube
-                                    sudo docker cp \$container:/usr/include/polycube /usr/include
+                                    sudo docker cp -a \$container:/usr/include/polycube /usr/include
                                     
                                     # Copying libraries
                                     for lib in \$(docker exec \$container ls /usr/lib | grep "libp")
