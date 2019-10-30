@@ -12,6 +12,10 @@ echo "container content in /usr/local/bin:"
 docker exec $container /bin/ls /usr/local/bin
 echo "Copying $container:/usr/local/bin to /usr/local"
 sudo docker cp -a $container:/usr/local/bin /usr/local
+echo "container content in /usr/local/share/polycube:"
+docker exec $container /bin/ls /usr/local/share/polycube
+echo "Copying $container:/usr/local/share/polycube to /usr/local/share"
+sudo docker cp -a $container:/usr/local/share/polycube /usr/local/share
 # Copying headers
 echo "# Copying headers"
 echo "container content in /usr/include/polycube:"
