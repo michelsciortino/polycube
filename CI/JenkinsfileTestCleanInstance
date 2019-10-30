@@ -224,7 +224,7 @@ pipeline {
                                     export KILL_COMMAND="docker stop $container"
                                     
                                     # /proc is mounted under /host/proc to have a complete visibility of the namespaces created outside of the container
-                                    export polycubed="docker run -d --name $container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-pcn-iptables:${image_tag}"
+                                    export polycubed="docker run -d --name $container --rm --privileged --pid=host --cap-add ALL --network host -v /proc:/host/proc -v /lib/modules:/lib/modules:ro -v /var/run/netns/:/var/run/netns:rw -v /usr/src:/usr/src:ro -v /etc/localtime:/etc/localtime:ro polycubebot/${image_name}-default:${image_tag}"
 
                                     # Launch the polycubed daemon
                                     \$polycubed /bin/sleep infinity

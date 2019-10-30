@@ -27,14 +27,14 @@ for lib in $(docker exec $container ls /usr/lib | grep "libp"); do
     echo "Copying $container:/usr/lib/$lib to /usr/lib/"
     sudo docker cp $container:/usr/lib/$lib /usr/lib/
 done
-sudo ldconfig -n /usr/lib
+#sudo ldconfig -n /usr/lib
 echo "container content in /usr/local/lib:"
 docker exec $container /bin/ls /usr/local/lib | /bin/grep "lib"
 for lib in $(docker exec $container ls /usr/local/lib | grep "lib"); do
     echo "Copying $container:/usr/local/lib/$lib to /usr/local/lib"
     sudo docker cp $container:/usr/local/lib/$lib /usr/local/lib
 done
-sudo ldconfig -n /usr/local/lib
+#sudo ldconfig -n /usr/local/lib
 echo "container content in /usr/lib/x86_64-linux-gnu:"
 docker exec $container /bin/ls /usr/lib/x86_64-linux-gnu | /bin/grep -P "libyang|libnl"
 for lib in $(docker exec $container ls /usr/lib/x86_64-linux-gnu/ | grep -P "libyang|libnl"); do
@@ -54,4 +54,5 @@ docker exec $container /bin/ls /usr/local/include/polycube
 sudo mkdir -p /usr/local/include/polycube
 echo "Copying $container:/usr/local/include/polycube to /usr/local/include/"
 sudo docker cp -a $container:/usr/local/include/polycube /usr/local/include/
-sudo ldconfig -n /usr/local/include/
+#sudo ldconfig -n /usr/local/include/
+sudo ldconfig
