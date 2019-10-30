@@ -234,6 +234,9 @@ pipeline {
 
                                     \$KILL_COMMAND
 
+                                    \$polycubed
+                                    docker ps
+
                                     cd tests/
                                     # For the moment, tests always returns 0 to enable junit generation
                                     ./run-tests.sh || true

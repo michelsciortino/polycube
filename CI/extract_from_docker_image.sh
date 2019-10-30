@@ -6,7 +6,6 @@ then
 fi
 # Checking if the container is up
 docker ps
-docker exec $container /bin/ls
 # Copying binaries
 echo "# Copying binaries"
 echo "container content in /usr/local/bin:"
