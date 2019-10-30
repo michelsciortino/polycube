@@ -246,6 +246,7 @@ pipeline {
                                     pip install -r converter/requirements.txt
                                     export TEST_RESULTS=`ls -1 test_results_*`
                                     python3 converter/to_junit.py CleanInstance
+                                    cd ..
 
                                     # Cleaning slave
                                     sudo ./CI/clean_slave.sh
@@ -320,7 +321,8 @@ pipeline {
                                     pip install -r converter/requirements.txt
                                     export TEST_RESULTS=`ls -1 test_results_*`
                                     python3 converter/to_junit.py SameInstance
-
+                                    cd ..
+                                    
                                     # Cleaning slave
                                     sudo ./CI/clean_slave.sh
                                 """
@@ -393,7 +395,8 @@ pipeline {
                                     pip install -r converter/requirements.txt
                                     export TEST_RESULTS=`ls -1 test_results_*`
                                     python3 converter/to_junit.py Iptables
-
+                                    cd ..
+                                    
                                     # Cleaning slave
                                     sudo ./CI/clean_slave.sh
                                 """
