@@ -232,7 +232,7 @@ pipeline {
                                     # Copy binaries, headers and libraries from docker to host fs
                                     sudo ./CI/extract_from_docker_image.sh $container
 
-                                    $KILL_COMMAND
+                                    \$KILL_COMMAND
 
                                     cd tests/
                                     # For the moment, tests always returns 0 to enable junit generation
