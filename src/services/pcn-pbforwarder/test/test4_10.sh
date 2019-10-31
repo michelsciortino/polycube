@@ -26,8 +26,8 @@ polycubectl pbforwarder pbf1 set loglevel=TRACE
 pbforwarder_add_rules_l4 0 6 pbf1
 
 # Get the MAC addresses of the namespaces
-veth1_mac=`LANG=C sudo ip netns exec ns1 ifconfig -a | grep -Po 'HWaddr \K.*$'`
-veth2_mac=`LANG=C sudo ip netns exec ns2 ifconfig -a | grep -Po 'HWaddr \K.*$'`
+veth1_mac=`LANG=C sudo ip netns exec ns1 ifconfig -a | grep -Po 'ether \K.*$'`
+veth2_mac=`LANG=C sudo ip netns exec ns2 ifconfig -a | grep -Po 'ether \K.*$'`
 
 # This should be matched on the UDP packet sent
 polycubectl pbforwarder pbf1 rules add 6 dst_mac=$veth2_mac dst_ip=10.0.0.2 l4_proto=UDP dst_port=53 action=FORWARD out_port=veth2
