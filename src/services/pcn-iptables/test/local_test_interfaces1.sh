@@ -19,8 +19,6 @@ echo -e "\nTest $0 \n"
 set -e
 set -x
 
-sudo iptables -P FORWARD DROP
-
 launch_iptables
 
 enable_ip_forwarding
@@ -50,6 +48,7 @@ sudo ip netns exec ns1 ping 10.0.2.1 -c 2 -W 2
 # test -i on FORWARD chain
 
 pcn-iptables -P FORWARD DROP
+sudo iptables -P FORWARD DROP
 
 test_fail sudo ip netns exec ns1 ping 10.0.2.1 -c 2 -W 2
 
@@ -70,6 +69,7 @@ pcn-iptables -D FORWARD -i veth2 -j ACCEPT
 test_fail sudo ip netns exec ns1 ping 10.0.2.1 -c 2 -W 2
 
 pcn-iptables -P FORWARD ACCEPT
+sudo iptables -P FORWARD ACCEPT
 
 sudo ip netns exec ns1 ping 10.0.2.1 -c 2 -W 2
 
