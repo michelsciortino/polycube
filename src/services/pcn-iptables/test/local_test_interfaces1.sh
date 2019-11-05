@@ -6,7 +6,6 @@ source "${BASH_SOURCE%/*}/helpers.bash"
 
 function iptablescleanup {
     set +e
-    sudo iptables -P FORWARD ACCEPT
     polycubectl iptables del pcn-iptables
     sudo ip netns del ns1
     sudo ip link del veth1
@@ -48,7 +47,6 @@ sudo ip netns exec ns1 ping 10.0.2.1 -c 2 -W 2
 # test -i on FORWARD chain
 
 pcn-iptables -P FORWARD DROP
-sudo iptables -P FORWARD DROP
 
 test_fail sudo ip netns exec ns1 ping 10.0.2.1 -c 2 -W 2
 
@@ -69,7 +67,6 @@ pcn-iptables -D FORWARD -i veth2 -j ACCEPT
 test_fail sudo ip netns exec ns1 ping 10.0.2.1 -c 2 -W 2
 
 pcn-iptables -P FORWARD ACCEPT
-sudo iptables -P FORWARD ACCEPT
 
 sudo ip netns exec ns1 ping 10.0.2.1 -c 2 -W 2
 
