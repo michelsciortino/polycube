@@ -6,6 +6,7 @@ source "${BASH_SOURCE%/*}/helpers.bash"
 
 function iptablescleanup {
     set +e
+    sudo iptables -P FORWARD ACCEPT
     polycubectl iptables del pcn-iptables
     sudo ip netns del ns1
     sudo ip link del veth1
@@ -17,6 +18,8 @@ trap iptablescleanup EXIT
 echo -e "\nTest $0 \n"
 set -e
 set -x
+
+sudo iptables -P FORWARD DROP
 
 launch_iptables
 

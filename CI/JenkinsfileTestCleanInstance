@@ -387,8 +387,6 @@ pipeline {
                                     \$KILL_COMMAND
 
                                     \$polycubed
-
-                                    sudo iptables -P FORWARD DROP
                                     
                                     cd tests/ && ./run-tests-iptables.sh || true
                                     export LC_ALL=C
@@ -398,8 +396,6 @@ pipeline {
                                     export TEST_RESULTS=`ls -1 test_results_*`
                                     python3 converter/to_junit.py Iptables
                                     cd ..
-
-                                    sudo iptables -P FORWARD ACCEPT
 
                                     # Cleaning slave
                                     sudo ./CI/clean_slave.sh
