@@ -1,0 +1,131 @@
+module dynmonitor {
+    yang-version 1.1;
+    namespace "http://polycube.network/dyn-monitor";
+    prefix "dyn-monitor";
+
+    import polycube-base {
+        prefix "polycube-base";
+    }
+    import polycube-transparent-base {
+        prefix "polycube-transparent-base";
+    }
+    import "ietf-inet-types" {
+        prefix "inet";
+    }
+    import "ietf-yang-types" {
+        prefix "yang";
+    }
+
+    organization
+      "Polycube open source project";
+    description
+      "YANG data model for the Polycube Dynamic Monitor transparent service";
+    polycube-base:service-description "Dynamic Monitor transparent service";
+    polycube-base:service-version "1.0";
+    polycube-base:service-name "dyn-monitor";
+    polycube-base:service-min-kernel-version "4.14.0";
+
+    uses polycube-transparent-base:transparent-base-yang-module;
+
+    container dataplane{
+        description "Running probe";
+        config true;
+
+        leaf name {
+            type string;
+            description "Program name";
+        }
+
+        leaf code {
+            type string;
+            description "eBPF code";
+        }
+
+        container metrics{
+            description "Exported Metrics";
+
+            list counters{
+                key "name";
+                description "The list of exported coutners";
+
+                //definition of a counter
+                leaf name{
+                    type string;
+                    description "Counter name";
+                }
+
+                leaf table-name{
+                    type string;
+                    description "The corrisponding eBPF Table name";
+                }
+
+                leaf table-type{
+                    type string;
+                }
+
+                leaf min-entries{
+                    type uint64;
+                    description "Max number of entries in the table";
+                }
+
+                list lables{
+                    key "name";
+                    leaf name{
+                        type string;
+                        description "LableName";
+                    }
+                }
+            }
+
+            // list gauges{
+            //     description "The list of exported gauges";
+            // }
+
+            // list histograms{
+            //     description "The list of exported histograms";
+            // }
+
+            // list summaries{
+            //     description "The list of exported summaries";
+            // }
+        }
+    }
+
+    container metrics{
+        description "Collected metrics";
+        config false;
+        list entry {
+                key "name";
+
+                leaf name{
+                    type string;
+                    description "Metric's name";
+                }
+
+                list lables{
+                    key "name";
+                    leaf name{
+                        type string;
+                        description "LableName";
+                    }
+
+                    leaf value{
+                        type string;
+                        description "Lable value";
+                    }
+                }
+
+                leaf value{
+                    type decimal64 {
+                        fraction-digits 18;
+                    }
+                    description "Metric's value";
+                }
+
+                leaf timestamp{
+                    type int64;
+                    description "Timestamp";
+                }
+        }
+    }
+}
